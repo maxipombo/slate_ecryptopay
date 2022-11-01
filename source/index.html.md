@@ -1,245 +1,178 @@
 ---
-title: API Reference
+title: API ecryptopay
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
+# - shell
 
-toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
+# toc_footers:
+#   - <a href='#'>Sign Up for a Developer Key</a>
+#   - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
 
 includes:
-  - errors
+# - errors
 
-search: true
+search: false
 
 code_clipboard: true
 
 meta:
-  - name: description
-    content: Documentation for the Kittn API
+  - name: ecryptopay
+    content: Procesador de pagos de criptomonedas con Bitso para B2B.
 ---
 
-# Introduction
+# Introducción
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Bienvenido a la documentación de la API de ecryptopay! Puedes usarla para acceder a los endpoints en los que podrás obtener la información necesaria para implementar la generación de formatos de pago con criptomonedas.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+Actualmente la API se encuentra en fase experimental por lo que podremos tener cambios mayores en la implementación, igualmente el equipo estará disponible para resolver cualquier duda.
+# Autenticación
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
-
-# Authentication
-
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
-
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
+Con ecryptopay usamos la autenticación con un token Bearer que lo puedes generar haciendo una petición con el email y password de tu cuenta usando el `client_id` y `client_secret` establecido en el dashboard de tu cuenta en [configuración de api](https://ecryptopay.com/user/account/api).
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`POST https://ecryptopay.com/api/v1/oauth/token`
 
-### Query Parameters
+### Body Parameters
+
+Body parameters should be JSON encoded and should be exactly the same as the JSON payload used to construct the signature.
+
+Parameter | Default | Required | Description
+--------- | ------- | -------- | -----------
+grant_type | password | true | -
+email | - | true | Email de la cuenta de acceso al dashboard.
+password | - | true | Password de la cuenta de acceso al dashboard.
+client_id | - | true | -
+client_secret | - | true | -
+
+### JSON Response Payload
+
+Returns a JSON object representing the order:
+
+Field Name | Type | Description | Units
+---------- | ---- | ----------- | -----
+access_token | String | - | -
+token_type | String | - | -
+expires_in | Integer | - | -
+refresh_token | String | - | -
+created_at | Integer | Timestamp at which the token request was created | -
+
+# Formatos de pago
+
+## Get All Payments
+
+This endpoint retrieves all payments.
+
+### HTTP Request
+
+`GET https://ecryptopay.com/api/v1/payments`
+
+### Header Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+authorization | Bearer `<access_token>` | See [Autenticación](#autenticacion)
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+### JSON Response Payload
+
+Returns a JSON Array of payments. Every element in the array is a JSON object:
+
+Field Name | Type | Description | Units
+---------- | ---- | ----------- | -----
+id | Integer | - | -
+currency | String | The cryptocurrency of convertion | -
+amount | String | The original amount on Mexican Peso | -
+created_at | String | - | -
+updated_at | String | - | -
+state | String | The state of the payment  | -
+currency_amount | String | The amount on the currency selected | -
+
+## Get a Specific Payment
+
+This endpoint retrieves a specific payment.
+### HTTP Request
+
+`GET https://ecryptopay.com/api/v1/payments/<ID>`
+
+### Header Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+authorization | Bearer `<access_token>` | See [Autenticación](#autenticacion)
+
+### JSON Response Payload
+
+Returns a payment.
+
+Field Name | Type | Description | Units
+---------- | ---- | ----------- | -----
+id | Integer | - | -
+currency | String | The cryptocurrency of convertion | -
+amount | String | The original amount on Mexican Peso | -
+created_at | String | - | -
+updated_at | String | - | -
+state | String | The status of the payment  | -
+currency_amount | String | The amount on the currency selected | -
+qr_image_path | String | The url of the QR code generated | -
+
+## Post a Payment
+
+This endpoint allows you create a payment
+### HTTP Request
+
+`GET https://ecryptopay.com/api/v1/payments/<ID>`
+
+### Header Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+authorization | Bearer `<access_token>` | See [Autenticación](#autenticacion)
+
+### Body Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+currency | `btc` | -
+amount | - | The amount on Mexican Peso
+
+### JSON Response Payload
+
+Returns the payment created.
+
+Field Name | Type | Description | Units
+---------- | ---- | ----------- | -----
+id | Integer | - | -
+currency | String | The cryptocurrency of convertion | -
+amount | String | The original amount on Mexican Peso | -
+created_at | String | - | -
+updated_at | String | - | -
+currency_amount | String | The amount on the currency selected | -
+qr_image_path | String | The url of the QR code generated | -
+
+# Webhooks
+
+## Registering URL
+
+Users can register a callback url that will get hit with payloads corresponding to certain events described below. Puedes registrarla por medio del apartado de tu dashboard de [configuración de api](https://ecryptopay.com/user/account/api).
+
+<aside class="warning">
+Ten en cuenta que solo podrás registrar una URL solamente y si necesitas cambiarla deberás contactar a soporte.
 </aside>
 
-## Get a Specific Kitten
+## Payments
 
-```ruby
-require 'kittn'
+Users that register a webhook will get a POST payload to that URL with the following fields on payments.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
+### JSON Response Payload
 
-```python
-import kittn
+Returns a JSON object with the following fields:
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -X DELETE \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
+Field Name | Type | Description | Units
+---------- | ---- | ----------- | -----
+id | Integer | - | -
+currency | String | The cryptocurrency of convertion | -
+amount | String | The original amount on Mexican Peso | -
+created_at | String | - | -
+updated_at | String | - | -
+state | String | The status of the payment  | -
+currency_amount | String | The amount on the currency selected | -
