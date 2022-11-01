@@ -117,7 +117,7 @@ qr_image_path | String | The url of the QR code generated | -
 
 ## Post a Payment
 
-This endpoint allows you create a payment
+This endpoint allows you create a payment.
 ### HTTP Request
 
 `GET https://ecryptopay.com/api/v1/payments/<ID>`
@@ -148,6 +148,10 @@ created_at | String | - | -
 updated_at | String | - | -
 currency_amount | String | The amount on the currency selected | -
 qr_image_path | String | The url of the QR code generated | -
+
+<aside class="notice">
+  El currency_amount se deberá actualizar cada 25s, es necesario que se implemente la petición GET con el ID para poder actualizar el qr_image_path.
+</aside>
 
 # Webhooks
 
