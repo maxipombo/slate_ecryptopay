@@ -595,7 +595,7 @@
 </tr>
 </tbody></table>
 <h2 id='post-a-payment'>Post a Payment</h2>
-<p>This endpoint allows you create a payment</p>
+<p>This endpoint allows you create a payment.</p>
 <h3 id='http-request-4'>HTTP Request</h3>
 <p><code>GET https://ecryptopay.com/api/v1/payments/&lt;ID&gt;</code></p>
 <h3 id='header-parameters-3'>Header Parameters</h3>
@@ -685,6 +685,10 @@
 <td>-</td>
 </tr>
 </tbody></table>
+
+<aside class="notice">
+  El currency_amount se deberá actualizar cada 25s, es necesario que se implemente la petición GET con el ID para poder actualizar el qr_image_path.
+</aside>
 <h1 id='webhooks'>Webhooks</h1><h2 id='registering-url'>Registering URL</h2>
 <p>Users can register a callback url that will get hit with payloads corresponding to certain events described below. Puedes registrarla por medio del apartado de tu dashboard de <a href="https://ecryptopay.com/user/account/api">configuración de api</a>.</p>
 
