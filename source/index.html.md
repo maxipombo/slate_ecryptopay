@@ -120,7 +120,7 @@ qr_image_path | String | The url of the QR code generated | -
 This endpoint allows you create a payment.
 ### HTTP Request
 
-`GET https://ecryptopay.com/api/v1/payments/<ID>`
+`POST https://ecryptopay.com/api/v1/payments/`
 
 ### Header Parameters
 
